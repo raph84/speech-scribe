@@ -22,21 +22,23 @@ Requires Node ≥24.
 ## CLI usage
 
 ```
-speech-scribe <inputFile.json> <outputFile> [--max-gap-seconds=<n>] [--json|--markdown]
+speech-scribe [--max-gap-seconds=<n>] [--json|--markdown]
 ```
 
-- `<inputFile.json>` — a GCP Speech-to-Text v2 response JSON file.
-- `<outputFile>` — where to write the result.
-- `--json` — write the turns as a JSON array (`Turn[]`). Default is Markdown.
-- `--markdown` — write the turns as Markdown (default; explicit flag is optional).
+- `--json` — write the turns as a JSON array (`Turn[]`) (default; explicit flag is optional).
+- `--markdown` — write the turns as Markdown. Default is JSON.
 - `--max-gap-seconds=<n>` — also start a new turn if the pause between two consecutive words from the same speaker exceeds `n` seconds. Default: never split on a pause alone.
+
+Input is read from stdin; output is written to stdout. Redirect to/from files as needed.
 
 Examples:
 
 ```bash
-node dist/cli.js transcript.json turns.md
-node dist/cli.js transcript.json turns.json --json
-node dist/cli.js transcript.json turns.md --max-gap-seconds=5
+node dist/cli.js < transcript.json > turns.json
+node dist/cli.js --markdown < transcript.json > turns.md
+node dist/cli.js --max-gap-seconds=5 < transcript.json > turns.json
+
+cat transcript.json | node dist/cli.js | jq .
 ```
 
 Markdown output looks like:

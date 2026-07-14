@@ -1,23 +1,20 @@
-import { readFile, writeFile } from "node:fs/promises";
 import { formatTurnsAsMarkdown } from "./format.js";
 import { groupWordsIntoTurns } from "./group.js";
 import { parseRecognizeResponse } from "./parse.js";
 
 const USAGE =
-  "Usage: speech-scribe <inputFile.json> <outputFile> [--max-gap-seconds=<n>] [--json|--markdown]";
+  "Usage: speech-scribe [--max-gap-seconds=<n>] [--json|--markdown]\n" +
+  "  Reads input JSON from stdin; output is written to stdout.";
 
 type OutputFormat = "json" | "markdown";
 
 function parseArgs(argv: string[]): {
-  inputPath: string;
-  outputPath: string;
   maxGapSeconds?: number;
   format: OutputFormat;
 } {
   const positional = argv.filter((arg) => !arg.startsWith("--"));
-  const [inputPath, outputPath] = positional;
 
-  if (!inputPath || !outputPath) {
+  if (positional.length > 0) {
     throw new Error(USAGE);
   }
 
@@ -35,36 +32,44 @@ function parseArgs(argv: string[]): {
     throw new Error("Specify at most one of --json or --markdown");
   }
 
-  const format: OutputFormat = wantsJson ? "json" : "markdown";
+  const format: OutputFormat = wantsMarkdown ? "markdown" : "json";
 
-  return { inputPath, outputPath, maxGapSeconds, format };
+  return { maxGapSeconds, format };
 }
 
-/** Testable CLI core: reads the input JSON, writes the output file as Markdown or JSON turns. */
+async function readStdin(): Promise<string> {
+  const chunks: Buffer[] = [];
+  for await (const chunk of process.stdin) {
+    chunks.push(chunk as Buffer);
+  }
+  return Buffer.concat(chunks).toString("utf-8");
+}
+
+/** Testable CLI core: reads the input JSON from stdin, writes Markdown or JSON turns to stdout. */
 export async function run(argv: string[]): Promise<void> {
   try {
-    const { inputPath, outputPath, maxGapSeconds, format } = parseArgs(argv);
+    const { maxGapSeconds, format } = parseArgs(argv);
 
     let raw: string;
     try {
-      raw = await readFile(inputPath, "utf-8");
+      raw = await readStdin();
     } catch (error) {
-      throw new Error(`Could not read input file '${inputPath}': ${(error as Error).message}`);
+      throw new Error(`Could not read input from stdin: ${(error as Error).message}`);
     }
 
     let json: unknown;
     try {
       json = JSON.parse(raw);
     } catch (error) {
-      throw new Error(`Invalid JSON in '${inputPath}': ${(error as Error).message}`);
+      throw new Error(`Invalid JSON in stdin: ${(error as Error).message}`);
     }
 
     const response = parseRecognizeResponse(json);
     const turns = groupWordsIntoTurns(response, { maxGapSeconds });
     const output = format === "json" ? JSON.stringify(turns, null, 2) : formatTurnsAsMarkdown(turns);
 
-    await writeFile(outputPath, output, "utf-8");
-    console.log(`Wrote ${turns.length} turn(s) to ${outputPath}`);
+    process.stdout.write(output);
+    console.error(`Wrote ${turns.length} turn(s) to stdout`);
   } catch (error) {
     console.error(`Error: ${(error as Error).message}`);
     process.exitCode = 1;
