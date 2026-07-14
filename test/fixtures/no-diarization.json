@@ -1,0 +1,16 @@
+{
+  "results": [
+    {
+      "alternatives": [
+        {
+          "transcript": "Hello there",
+          "confidence": 0.98,
+          "words": [
+            { "word": "Hello", "startOffset": "0s", "endOffset": "0.500s" },
+            { "word": "there", "startOffset": "0.500s", "endOffset": "1s" }
+          ]
+        }
+      ]
+    }
+  ]
+}
