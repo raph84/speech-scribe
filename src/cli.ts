@@ -80,7 +80,8 @@ export async function run(argv: string[]): Promise<void> {
 
     const response = parseRecognizeResponse(json);
     const turns = groupWordsIntoTurns(response, { maxGapSeconds });
-    const output = format === "json" ? JSON.stringify(turns, null, 2) : formatTurnsAsMarkdown(turns);
+    const output =
+      format === "json" ? JSON.stringify({ turns }, null, 2) : formatTurnsAsMarkdown(turns);
 
     process.stdout.write(output);
     console.error(`Wrote ${turns.length} turn(s) to stdout`);

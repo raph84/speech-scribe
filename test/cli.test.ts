@@ -31,7 +31,7 @@ describe("cli run()", () => {
 
     expect(process.exitCode).not.toBe(1);
     expect(writeSpy).toHaveBeenCalledTimes(1);
-    const turns = JSON.parse(writeSpy.mock.calls[0][0] as string);
+    const { turns } = JSON.parse(writeSpy.mock.calls[0][0] as string);
     expect(turns).toEqual([
       { speaker: "1", text: "Hello there", startTime: 0, endTime: 1 },
       { speaker: "2", text: "Hi how are", startTime: 1.2, endTime: 2.3 },
@@ -57,7 +57,7 @@ describe("cli run()", () => {
     await run(["--json"]);
 
     expect(process.exitCode).not.toBe(1);
-    const turns = JSON.parse(writeSpy.mock.calls[0][0] as string);
+    const { turns } = JSON.parse(writeSpy.mock.calls[0][0] as string);
     expect(turns).toEqual([
       { speaker: "1", text: "Hello there", startTime: 0, endTime: 1 },
       { speaker: "2", text: "Hi how are", startTime: 1.2, endTime: 2.3 },

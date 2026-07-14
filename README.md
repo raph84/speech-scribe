@@ -25,7 +25,7 @@ Requires Node ≥24.
 speech-scribe [--max-gap-seconds=<n>] [--json|--markdown]
 ```
 
-- `--json` — write the turns as a JSON array (`Turn[]`) (default; explicit flag is optional).
+- `--json` — write the turns as `{ "turns": Turn[] }` (default; explicit flag is optional).
 - `--markdown` — write the turns as Markdown. Default is JSON.
 - `--max-gap-seconds=<n>` — also start a new turn if the pause between two consecutive words from the same speaker exceeds `n` seconds. Default: never split on a pause alone.
 
