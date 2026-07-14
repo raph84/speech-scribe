@@ -41,6 +41,14 @@ node dist/cli.js --max-gap-seconds=5 < transcript.json > turns.json
 cat transcript.json | node dist/cli.js | jq .
 ```
 
+You can pipe directly to/from a GCS bucket without touching local disk:
+
+```bash
+gcloud storage cp 'gs://my-bucket/transcripts/interview-2026-07-14.json' - \
+  | node dist/cli.js --markdown \
+  | gcloud storage cp - 'gs://my-bucket/markdown/interview-2026-07-14.md'
+```
+
 Markdown output looks like:
 
 ```markdown
