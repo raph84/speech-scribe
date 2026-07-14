@@ -29,4 +29,12 @@ describe("parseDuration", () => {
   it("throws on a malformed Duration string", () => {
     expect(() => parseDuration("abc")).toThrow(TypeError);
   });
+
+  it("throws on a Duration object with a non-numeric seconds field", () => {
+    expect(() => parseDuration({ seconds: "abc" })).toThrow(TypeError);
+  });
+
+  it("throws on a Duration object with a non-finite nanos field", () => {
+    expect(() => parseDuration({ seconds: 1, nanos: NaN })).toThrow(TypeError);
+  });
 });

@@ -20,8 +20,11 @@ export function parseDuration(value: DurationLike | undefined): number {
   }
 
   if (typeof value === "object" && value !== null) {
-    const seconds = Number(value.seconds ?? 0);
-    const nanos = value.nanos ?? 0;
+    const seconds = value.seconds === undefined ? 0 : Number(value.seconds);
+    const nanos = value.nanos === undefined ? 0 : value.nanos;
+    if (!Number.isFinite(seconds) || !Number.isFinite(nanos)) {
+      throw new TypeError(`Invalid Duration object: ${JSON.stringify(value)}`);
+    }
     return seconds + nanos / 1e9;
   }
 
