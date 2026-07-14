@@ -54,9 +54,7 @@ describe("parseRecognizeResponse", () => {
           alternatives: [
             {
               transcript: "hi there",
-              words: [
-                { startOffset: "0s", endOffset: "1s", speakerLabel: "1" },
-              ],
+              words: [{ startOffset: "0s", endOffset: "1s", speakerLabel: "1" }],
             },
           ],
         },

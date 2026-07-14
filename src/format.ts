@@ -19,7 +19,5 @@ function defaultSpeakerLabelToDisplayName(label: string): string {
 export function formatTurnsAsMarkdown(turns: Turn[], options: FormatOptions = {}): string {
   const toDisplayName = options.speakerLabelToDisplayName ?? defaultSpeakerLabelToDisplayName;
 
-  return turns
-    .map((turn) => `- **${toDisplayName(turn.speaker)}:** ${turn.text}`)
-    .join("\n");
+  return turns.map((turn) => `- **${toDisplayName(turn.speaker)}:** ${turn.text}`).join("\n");
 }

@@ -29,10 +29,7 @@ interface FlatWord {
   endTime: number | undefined;
 }
 
-function flattenWords(
-  response: RecognizeResponse,
-  unknownSpeakerLabel: string,
-): FlatWord[] {
+function flattenWords(response: RecognizeResponse, unknownSpeakerLabel: string): FlatWord[] {
   const flat: FlatWord[] = [];
 
   for (const result of response.results ?? []) {
@@ -69,9 +66,12 @@ export function groupWordsIntoTurns(
   const words = flattenWords(response, unknownSpeakerLabel);
   const turns: Turn[] = [];
 
-  let current:
-    | { speaker: string; words: string[]; startTime: number | undefined; endTime: number | undefined }
-    | null = null;
+  let current: {
+    speaker: string;
+    words: string[];
+    startTime: number | undefined;
+    endTime: number | undefined;
+  } | null = null;
 
   const flushCurrentTurn = () => {
     if (current !== null) {
@@ -85,14 +85,13 @@ export function groupWordsIntoTurns(
   };
 
   for (const word of words) {
-    const startsNewTurn =
+    if (
       current === null ||
       word.speaker !== current.speaker ||
       (word.startTime !== undefined &&
         current.endTime !== undefined &&
-        word.startTime - current.endTime > maxGapSeconds);
-
-    if (startsNewTurn) {
+        word.startTime - current.endTime > maxGapSeconds)
+    ) {
       flushCurrentTurn();
       current = {
         speaker: word.speaker,
@@ -101,8 +100,8 @@ export function groupWordsIntoTurns(
         endTime: word.endTime,
       };
     } else {
-      current!.words.push(word.word);
-      current!.endTime = word.endTime;
+      current.words.push(word.word);
+      current.endTime = word.endTime;
     }
   }
 
