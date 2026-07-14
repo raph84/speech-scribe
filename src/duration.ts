@@ -4,12 +4,12 @@ const DURATION_STRING_PATTERN = /^-?\d+(\.\d+)?s$/;
 
 /**
  * Converts a protobuf.Duration (string "1.200s" or { seconds, nanos } object
- * form) into a number of seconds. Missing offsets default to 0 rather than
- * throwing, since callers still need a numeric startTime/endTime.
+ * form) into a number of seconds. Returns undefined when the offset itself is
+ * missing, rather than a value like 0 that could be mistaken for real data.
  */
-export function parseDuration(value: DurationLike | undefined): number {
+export function parseDuration(value: DurationLike | undefined): number | undefined {
   if (value === undefined) {
-    return 0;
+    return undefined;
   }
 
   if (typeof value === "string") {

@@ -67,16 +67,16 @@ const markdown = formatTurnsAsMarkdown(turns);
   - `options.unknownSpeakerLabel` — label used for words with no `speakerLabel` (diarization disabled). Default: `"unknown"`.
 - `formatTurnsAsMarkdown(turns: Turn[], options?: FormatOptions): string` — renders one turn per line: `` - **Speaker 1:** text ``.
   - `options.speakerLabelToDisplayName` — override how a raw `speaker` label (e.g. `"1"`, `"unknown"`) is displayed. Default: `"1"` → `Speaker 1`, `"unknown"` → `Unknown Speaker`.
-- `parseDuration(value: DurationLike | undefined): number` — converts a protobuf `Duration` (`"1.200s"` string or `{ seconds, nanos }` object) to seconds.
+- `parseDuration(value: DurationLike | undefined): number | undefined` — converts a protobuf `Duration` (`"1.200s"` string or `{ seconds, nanos }` object) to seconds; returns `undefined` if the offset is missing.
 
 ### Types
 
 ```ts
 interface Turn {
-  speaker: string;   // raw speakerLabel, or "unknown" if diarization wasn't enabled
+  speaker: string;    // raw speakerLabel, or "unknown" if diarization wasn't enabled
   text: string;
-  startTime: number; // seconds
-  endTime: number;   // seconds
+  startTime?: number; // seconds; omitted if the source word had no startOffset
+  endTime?: number;   // seconds; omitted if the source word had no endOffset
 }
 ```
 

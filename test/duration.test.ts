@@ -18,8 +18,8 @@ describe("parseDuration", () => {
     expect(parseDuration({ seconds: 1, nanos: 200000000 })).toBeCloseTo(1.2);
   });
 
-  it("defaults undefined to 0", () => {
-    expect(parseDuration(undefined)).toBe(0);
+  it("returns undefined when the offset is missing", () => {
+    expect(parseDuration(undefined)).toBeUndefined();
   });
 
   it("defaults an empty Duration object to 0", () => {

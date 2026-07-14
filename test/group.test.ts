@@ -80,4 +80,28 @@ describe("groupWordsIntoTurns", () => {
     expect(turns[0].text).toBe("hello");
     expect(turns[1].text).toBe("still there");
   });
+
+  it("omits startTime/endTime when the source word has no offsets, without inferring them", () => {
+    const response: RecognizeResponse = {
+      results: [
+        {
+          alternatives: [
+            {
+              transcript: "hello there",
+              words: [
+                { word: "hello", speakerLabel: "1" },
+                { word: "there", endOffset: "1.500s", speakerLabel: "1" },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+
+    const turns = groupWordsIntoTurns(response);
+    expect(turns).toHaveLength(1);
+    expect(turns[0].startTime).toBeUndefined();
+    expect(turns[0].endTime).toBeCloseTo(1.5);
+    expect(JSON.stringify(turns[0])).not.toContain("startTime");
+  });
 });

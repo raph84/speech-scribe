@@ -5,8 +5,10 @@ export interface Turn {
   /** Raw speakerLabel (or the unknown-speaker sentinel if absent). */
   speaker: string;
   text: string;
-  startTime: number;
-  endTime: number;
+  /** Omitted when the source word's startOffset was missing. */
+  startTime?: number;
+  /** Omitted when the source word's endOffset was missing. */
+  endTime?: number;
 }
 
 export interface GroupOptions {
@@ -23,8 +25,8 @@ export interface GroupOptions {
 interface FlatWord {
   speaker: string;
   word: string;
-  startTime: number;
-  endTime: number;
+  startTime: number | undefined;
+  endTime: number | undefined;
 }
 
 function flattenWords(
@@ -67,8 +69,9 @@ export function groupWordsIntoTurns(
   const words = flattenWords(response, unknownSpeakerLabel);
   const turns: Turn[] = [];
 
-  let current: { speaker: string; words: string[]; startTime: number; endTime: number } | null =
-    null;
+  let current:
+    | { speaker: string; words: string[]; startTime: number | undefined; endTime: number | undefined }
+    | null = null;
 
   const flushCurrentTurn = () => {
     if (current !== null) {
@@ -85,7 +88,9 @@ export function groupWordsIntoTurns(
     const startsNewTurn =
       current === null ||
       word.speaker !== current.speaker ||
-      word.startTime - current.endTime > maxGapSeconds;
+      (word.startTime !== undefined &&
+        current.endTime !== undefined &&
+        word.startTime - current.endTime > maxGapSeconds);
 
     if (startsNewTurn) {
       flushCurrentTurn();
