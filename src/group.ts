@@ -70,6 +70,17 @@ export function groupWordsIntoTurns(
   let current: { speaker: string; words: string[]; startTime: number; endTime: number } | null =
     null;
 
+  const flushCurrentTurn = () => {
+    if (current !== null) {
+      turns.push({
+        speaker: current.speaker,
+        text: current.words.join(" "),
+        startTime: current.startTime,
+        endTime: current.endTime,
+      });
+    }
+  };
+
   for (const word of words) {
     const startsNewTurn =
       current === null ||
@@ -77,14 +88,7 @@ export function groupWordsIntoTurns(
       word.startTime - current.endTime > maxGapSeconds;
 
     if (startsNewTurn) {
-      if (current !== null) {
-        turns.push({
-          speaker: current.speaker,
-          text: current.words.join(" "),
-          startTime: current.startTime,
-          endTime: current.endTime,
-        });
-      }
+      flushCurrentTurn();
       current = {
         speaker: word.speaker,
         words: [word.word],
@@ -97,14 +101,7 @@ export function groupWordsIntoTurns(
     }
   }
 
-  if (current !== null) {
-    turns.push({
-      speaker: current.speaker,
-      text: current.words.join(" "),
-      startTime: current.startTime,
-      endTime: current.endTime,
-    });
-  }
+  flushCurrentTurn();
 
   return turns;
 }
