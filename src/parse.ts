@@ -19,18 +19,47 @@ export function parseRecognizeResponse(json: unknown): RecognizeResponse {
     );
   }
 
-  const first = results[0];
-  if (
-    first !== undefined &&
-    typeof first === "object" &&
-    first !== null &&
-    "result" in first &&
-    !("alternatives" in first)
-  ) {
-    throw new Error(
-      "This looks like a BatchRecognize GCS transcript envelope, which is not yet supported",
-    );
-  }
+  results.forEach((result, resultIndex) => {
+    if (typeof result !== "object" || result === null || Array.isArray(result)) {
+      throw new Error(
+        `results[${resultIndex}] is not an object — not a valid v2 SpeechRecognitionResult`,
+      );
+    }
+
+    if ("result" in result && !("alternatives" in result)) {
+      throw new Error(
+        "This looks like a BatchRecognize GCS transcript envelope, which is not yet supported",
+      );
+    }
+
+    const { alternatives } = result as { alternatives?: unknown };
+    if (!Array.isArray(alternatives)) {
+      return;
+    }
+
+    alternatives.forEach((alternative, altIndex) => {
+      if (typeof alternative !== "object" || alternative === null) {
+        return;
+      }
+
+      const { words } = alternative as { words?: unknown };
+      if (!Array.isArray(words)) {
+        return;
+      }
+
+      words.forEach((word, wordIndex) => {
+        if (
+          typeof word !== "object" ||
+          word === null ||
+          typeof (word as { word?: unknown }).word !== "string"
+        ) {
+          throw new Error(
+            `results[${resultIndex}].alternatives[${altIndex}].words[${wordIndex}] is missing a string 'word' field`,
+          );
+        }
+      });
+    });
+  });
 
   return json as RecognizeResponse;
 }
