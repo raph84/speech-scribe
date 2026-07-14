@@ -88,6 +88,18 @@ describe("cli run()", () => {
     process.exitCode = undefined;
   });
 
+  it("sets exitCode=1 and does not throw when --max-gap-seconds is given an empty value", async () => {
+    process.exitCode = undefined;
+    await stubStdinFromFixture("two-speakers.json");
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    await expect(run(["--max-gap-seconds="])).resolves.toBeUndefined();
+
+    expect(process.exitCode).toBe(1);
+    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining("Invalid --max-gap-seconds value"));
+    process.exitCode = undefined;
+  });
+
   it("sets exitCode=1 and does not throw on malformed JSON input", async () => {
     process.exitCode = undefined;
     await stubStdinFromFixture("malformed.json");
