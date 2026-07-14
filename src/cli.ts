@@ -1,3 +1,7 @@
+import { realpathSync } from "node:fs";
+import { text } from "node:stream/consumers";
+import { fileURLToPath } from "node:url";
+import { parseArgs } from "node:util";
 import { formatTurnsAsMarkdown } from "./format.js";
 import { groupWordsIntoTurns } from "./group.js";
 import { parseRecognizeResponse } from "./parse.js";
@@ -8,25 +12,39 @@ const USAGE =
 
 type OutputFormat = "json" | "markdown";
 
-function parseArgs(argv: string[]): {
+function parseCliArgs(argv: string[]): {
   maxGapSeconds?: number;
   format: OutputFormat;
 } {
-  const positional = argv.filter((arg) => !arg.startsWith("--"));
+  const { values, positionals } = parseArgs({
+    args: argv,
+    options: {
+      "max-gap-seconds": { type: "string" },
+      json: { type: "boolean" },
+      markdown: { type: "boolean" },
+    },
+    allowPositionals: true,
+    strict: false,
+  });
 
-  if (positional.length > 0) {
+  if (positionals.length > 0) {
     throw new Error(USAGE);
   }
 
-  const maxGapFlag = argv.find((arg) => arg.startsWith("--max-gap-seconds="));
-  const maxGapSeconds = maxGapFlag ? Number(maxGapFlag.split("=")[1]) : undefined;
+  const maxGapValue = values["max-gap-seconds"];
+  let maxGapSeconds: number | undefined;
 
-  if (maxGapFlag && Number.isNaN(maxGapSeconds)) {
-    throw new Error(`Invalid --max-gap-seconds value: ${maxGapFlag}`);
+  if (maxGapValue !== undefined) {
+    const raw = String(maxGapValue);
+    maxGapSeconds = raw === "" ? NaN : Number(raw);
+
+    if (Number.isNaN(maxGapSeconds)) {
+      throw new Error(`Invalid --max-gap-seconds value: --max-gap-seconds=${raw}`);
+    }
   }
 
-  const wantsJson = argv.includes("--json");
-  const wantsMarkdown = argv.includes("--markdown");
+  const wantsJson = Boolean(values.json);
+  const wantsMarkdown = Boolean(values.markdown);
 
   if (wantsJson && wantsMarkdown) {
     throw new Error("Specify at most one of --json or --markdown");
@@ -38,17 +56,13 @@ function parseArgs(argv: string[]): {
 }
 
 async function readStdin(): Promise<string> {
-  const chunks: Buffer[] = [];
-  for await (const chunk of process.stdin) {
-    chunks.push(chunk as Buffer);
-  }
-  return Buffer.concat(chunks).toString("utf-8");
+  return text(process.stdin);
 }
 
 /** Testable CLI core: reads the input JSON from stdin, writes Markdown or JSON turns to stdout. */
 export async function run(argv: string[]): Promise<void> {
   try {
-    const { maxGapSeconds, format } = parseArgs(argv);
+    const { maxGapSeconds, format } = parseCliArgs(argv);
 
     let raw: string;
     try {
@@ -76,6 +90,9 @@ export async function run(argv: string[]): Promise<void> {
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+const isMainModule =
+  process.argv[1] !== undefined && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url);
+
+if (isMainModule) {
   void run(process.argv.slice(2));
 }
