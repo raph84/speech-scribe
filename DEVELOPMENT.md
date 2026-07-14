@@ -71,3 +71,7 @@ cat /tmp/out.json
 - ESM throughout (`"type": "module"`, `NodeNext` module resolution) — relative imports in `src/` use explicit `.js` extensions even though the source files are `.ts`.
 - `parseRecognizeResponse` is the trust boundary: everything past it operates on typed `RecognizeResponse` data. Keep new input-validation logic there rather than scattering `unknown`-handling deeper in the pipeline.
 - The CLI's `run(argv)` never calls `process.exit()` directly — it sets `process.exitCode` so it stays callable/testable without killing the test process.
+
+## Commit messages
+
+Follow [Conventional Commits](https://www.conventionalcommits.org/): `<type>[optional scope]: <description>`, e.g. `feat(cli): add --max-gap-seconds flag` or `fix: handle missing speakerLabel on words`. Common types: `feat`, `fix`, `refactor`, `chore`, `docs`, `test`. Add a scope only when it clarifies which area changed; omit it otherwise.
