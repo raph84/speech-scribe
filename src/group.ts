@@ -29,10 +29,7 @@ interface FlatWord {
   endTime: number | undefined;
 }
 
-function flattenWords(
-  response: RecognizeResponse,
-  unknownSpeakerLabel: string,
-): FlatWord[] {
+function flattenWords(response: RecognizeResponse, unknownSpeakerLabel: string): FlatWord[] {
   const flat: FlatWord[] = [];
 
   for (const result of response.results ?? []) {
@@ -69,9 +66,12 @@ export function groupWordsIntoTurns(
   const words = flattenWords(response, unknownSpeakerLabel);
   const turns: Turn[] = [];
 
-  let current:
-    | { speaker: string; words: string[]; startTime: number | undefined; endTime: number | undefined }
-    | null = null;
+  let current: {
+    speaker: string;
+    words: string[];
+    startTime: number | undefined;
+    endTime: number | undefined;
+  } | null = null;
 
   const flushCurrentTurn = () => {
     if (current !== null) {

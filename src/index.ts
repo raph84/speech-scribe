@@ -1,13 +1,13 @@
 export { parseDuration } from "./duration.js";
-export { parseRecognizeResponse } from "./parse.js";
-export { groupWordsIntoTurns } from "./group.js";
-export type { Turn, GroupOptions } from "./group.js";
-export { formatTurnsAsMarkdown } from "./format.js";
 export type { FormatOptions } from "./format.js";
+export { formatTurnsAsMarkdown } from "./format.js";
+export type { GroupOptions, Turn } from "./group.js";
+export { groupWordsIntoTurns } from "./group.js";
+export { parseRecognizeResponse } from "./parse.js";
 export type {
   DurationLike,
-  WordInfo,
+  RecognizeResponse,
   SpeechRecognitionAlternative,
   SpeechRecognitionResult,
-  RecognizeResponse,
+  WordInfo,
 } from "./types.js";

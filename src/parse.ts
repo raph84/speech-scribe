@@ -14,9 +14,7 @@ export function parseRecognizeResponse(json: unknown): RecognizeResponse {
   const { results } = json as { results?: unknown };
 
   if (!Array.isArray(results)) {
-    throw new Error(
-      "Missing 'results' array — not a valid v2 SpeechRecognitionResponse",
-    );
+    throw new Error("Missing 'results' array — not a valid v2 SpeechRecognitionResponse");
   }
 
   results.forEach((result, resultIndex) => {

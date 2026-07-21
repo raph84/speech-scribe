@@ -73,7 +73,9 @@ describe("cli run()", () => {
     await expect(run(["--json", "--markdown"])).resolves.toBeUndefined();
 
     expect(process.exitCode).toBe(1);
-    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining("at most one of --json or --markdown"));
+    expect(errorSpy).toHaveBeenCalledWith(
+      expect.stringContaining("at most one of --json or --markdown"),
+    );
     process.exitCode = undefined;
   });
 
@@ -96,7 +98,9 @@ describe("cli run()", () => {
     await expect(run(["--max-gap-seconds="])).resolves.toBeUndefined();
 
     expect(process.exitCode).toBe(1);
-    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining("Invalid --max-gap-seconds value"));
+    expect(errorSpy).toHaveBeenCalledWith(
+      expect.stringContaining("Invalid --max-gap-seconds value"),
+    );
     process.exitCode = undefined;
   });
 
