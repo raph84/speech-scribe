@@ -85,14 +85,13 @@ export function groupWordsIntoTurns(
   };
 
   for (const word of words) {
-    const startsNewTurn =
+    if (
       current === null ||
       word.speaker !== current.speaker ||
       (word.startTime !== undefined &&
         current.endTime !== undefined &&
-        word.startTime - current.endTime > maxGapSeconds);
-
-    if (startsNewTurn) {
+        word.startTime - current.endTime > maxGapSeconds)
+    ) {
       flushCurrentTurn();
       current = {
         speaker: word.speaker,
@@ -101,8 +100,8 @@ export function groupWordsIntoTurns(
         endTime: word.endTime,
       };
     } else {
-      current!.words.push(word.word);
-      current!.endTime = word.endTime;
+      current.words.push(word.word);
+      current.endTime = word.endTime;
     }
   }
 
